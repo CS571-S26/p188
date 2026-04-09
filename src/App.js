@@ -1,9 +1,23 @@
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import AppNavbar from './components/AppNavbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import BookConsultation from './pages/BookConsultation';
+
 function App() {
   return (
-    <div>
-      <h1>Tour Company</h1>
-      <p>Coming soon.</p>
-    </div>
+    <HashRouter>
+      <div className="d-flex flex-column min-vh-100">
+        <AppNavbar />
+        <main className="flex-grow-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/book" element={<BookConsultation />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </HashRouter>
   );
 }
 
