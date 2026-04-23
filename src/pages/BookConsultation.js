@@ -16,7 +16,7 @@ import PageBanner from '../components/PageBanner';
      hide_gdpr_banner  → cleaner look inside the embed
    ================================================================ */
 const CALENDLY_URL =
-  'https://calendly.com/razarashid1019' +
+  'https://calendly.com/razarashid1019/30min' +
   '?background_color=FAFAF7' +
   '&text_color=1C2410' +
   '&primary_color=1A4228' +
