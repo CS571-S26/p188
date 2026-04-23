@@ -952,7 +952,183 @@ a { color: inherit; }
   box-shadow: 0 8px 32px rgba(45, 106, 79, 0.32);
 }
 
-/* ── 12. Utilities ────────────────────────────────────────────── */
+/* ── 12. Page Banner (reusable dark header for non-hero pages) ── */
+.page-banner {
+  background: linear-gradient(135deg, var(--green-deep) 0%, var(--ink) 100%);
+  padding: 4rem 0 3.5rem;
+}
+
+/* ── Explore Page ─────────────────────────────────────────────── */
+.explore-section {
+  background: var(--page-bg);
+  padding: var(--section-py) 0;
+}
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.8rem;
+}
+
+.filter-btn {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: var(--transition);
+  line-height: 1;
+}
+
+.filter-btn:hover {
+  border-color: var(--green-mid);
+  color: var(--green-deep);
+  background: rgba(45, 106, 79, 0.06);
+}
+
+.filter-btn.active {
+  background: var(--green-deep);
+  border-color: var(--green-deep);
+  color: #ffffff;
+}
+
+/* Region card */
+.region-card {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-md) !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  transition: var(--transition);
+  height: 100%;
+  background: #ffffff;
+}
+
+.region-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-5px);
+  border-color: transparent !important;
+}
+
+.region-card-img-wrap {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.region-card-img-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.65s var(--ease);
+}
+
+.region-card:hover .region-card-img-bg {
+  transform: scale(1.04);
+}
+
+.region-card-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.38) 100%);
+}
+
+.region-card-body {
+  padding: 1.4rem 1.6rem 1.8rem;
+}
+
+.region-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.region-tag {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--green-deep);
+  background: rgba(26, 66, 40, 0.08);
+  border: 1px solid rgba(26, 66, 40, 0.18);
+  padding: 0.18rem 0.55rem;
+  border-radius: 50px;
+}
+
+.region-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.region-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.68;
+  margin-bottom: 1rem;
+}
+
+.region-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 0.8rem;
+}
+
+.region-highlights li {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: 0.32rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.region-highlights li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.region-highlights li::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* Empty state (no filter results) */
+.explore-empty {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-muted);
+}
+
+.explore-empty i {
+  font-size: 2.5rem;
+  color: var(--border);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* ── 12b. Utilities ───────────────────────────────────────────── */
 .visually-hidden {
   position: absolute;
   width: 1px;

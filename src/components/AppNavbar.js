@@ -9,10 +9,10 @@ function AppNavbar() {
 
   const isHome = location.pathname === '/';
 
-  /* Scroll listener — switch to solid after 80px */
+  /* Turn solid after 80px of scroll */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
-    onScroll(); // run once on mount
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -22,10 +22,7 @@ function AppNavbar() {
     setExpanded(false);
   }, [location.pathname]);
 
-  /*
-   * Transparent when:  on home page AND not yet scrolled AND menu is closed
-   * Solid when:        scrolled, or on another page, or menu is open on mobile
-   */
+  /* Transparent: only on home page, before scroll, with menu closed */
   const isTransparent = isHome && !scrolled && !expanded;
 
   return (
@@ -45,19 +42,19 @@ function AppNavbar() {
           className="navbar-brand-custom"
           onClick={() => setExpanded(false)}
         >
-          <i className="bi bi-compass brand-icon" aria-hidden="true"></i>
+          <i className="bi bi-compass brand-icon" aria-hidden="true" />
           Pakistan Tours
         </Navbar.Brand>
 
-        {/* Mobile hamburger */}
+        {/* Mobile toggle */}
         <Navbar.Toggle
           aria-controls="main-nav"
           aria-label="Toggle navigation menu"
         />
 
-        {/* Nav links */}
         <Navbar.Collapse id="main-nav">
           <Nav className="ms-auto align-items-lg-center gap-lg-1">
+
             <Nav.Link
               as={NavLink}
               to="/"
@@ -68,7 +65,15 @@ function AppNavbar() {
               Home
             </Nav.Link>
 
-            {/* Spacer before CTA */}
+            <Nav.Link
+              as={NavLink}
+              to="/explore"
+              className="nav-link-custom"
+              onClick={() => setExpanded(false)}
+            >
+              Explore
+            </Nav.Link>
+
             <div className="ms-lg-2">
               <Link
                 to="/book"
@@ -79,6 +84,7 @@ function AppNavbar() {
                 Book Now
               </Link>
             </div>
+
           </Nav>
         </Navbar.Collapse>
       </Container>
