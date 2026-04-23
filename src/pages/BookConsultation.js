@@ -1,6 +1,5 @@
-import { InlineWidget, useCalendlyEventListener } from 'react-calendly';
-import { Container, Row, Col, Spinner } from 'react-bootstrap';
-import { useState } from 'react';
+import { InlineWidget } from 'react-calendly';
+import { Container, Row, Col } from 'react-bootstrap';
 import PageBanner from '../components/PageBanner';
 
 /* ================================================================
@@ -48,15 +47,6 @@ const STEPS = [
    Renders the real widget or a styled placeholder if not yet configured.
    ================================================================ */
 function CalendlyWidget() {
-  const [loaded, setLoaded] = useState(false);
-
-  /* Listen for the Calendly iframe "profile page viewed" event,
-     which fires once the calendar grid finishes loading */
-  useCalendlyEventListener({
-    onProfilePageViewed: () => setLoaded(true),
-    onEventTypeViewed:   () => setLoaded(true),
-  });
-
   if (!CALENDLY_CONFIGURED) {
     return (
       <div className="calendly-placeholder" role="status">
@@ -74,36 +64,10 @@ function CalendlyWidget() {
 
   return (
     <div className="calendly-shell">
-      {/* Spinner shown until Calendly fires its "viewed" event */}
-      {!loaded && (
-        <div className="calendly-loading" aria-live="polite">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading calendar…</span>
-          </Spinner>
-          <span>Loading availability…</span>
-        </div>
-      )}
-
-      {/*
-        InlineWidget renders an <iframe> from Calendly.
-        iframeTitle is required for screen-reader accessibility.
-        pageSettings lets us strip chrome that would look redundant
-        inside our own page layout.
-      */}
       <InlineWidget
         url={CALENDLY_URL}
         iframeTitle="Book a Pakistan Tours consultation"
-        styles={{
-          /* Widget auto-resizes via postMessage; 680px is the minimum
-             before Calendly's own scrollbar kicks in */
-          minWidth: '100%',
-          height:   '680px',
-          display:  loaded ? 'block' : 'none',
-        }}
-        pageSettings={{
-          hideEventTypeDetails: false, // keep the event summary (name, duration)
-          hideLandingPageDetails: false,
-        }}
+        styles={{ minWidth: '100%', height: '680px' }}
       />
     </div>
   );
