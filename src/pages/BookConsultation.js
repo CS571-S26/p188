@@ -1,330 +1,180 @@
+import { InlineWidget, useCalendlyEventListener } from 'react-calendly';
+import { Container, Row, Col, Spinner } from 'react-bootstrap';
 import { useState } from 'react';
-import { Container, Row, Col, Card, Form, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import PageBanner from '../components/PageBanner';
 
-const CATEGORIES = [
-  { value: '',             label: 'Select a category…' },
-  { value: 'cultural',    label: 'Cultural Heritage' },
-  { value: 'nature',      label: 'Nature & Adventure' },
-  { value: 'shopping',    label: 'Bazaars & Shopping' },
-  { value: 'sightseeing', label: 'Sightseeing & Landmarks' },
-  { value: 'mixed',       label: "I'm open to a mix!" },
+/* ================================================================
+   YOUR CALENDLY URL
+   1. Create a free account at https://calendly.com
+   2. Make an event type (e.g. "Pakistan Tours Consultation · 30 min")
+   3. Replace the string below with your real event URL
+
+   The query params customise the widget's colours to match the site:
+     background_color  → warm off-white (#FAFAF7 without the #)
+     text_color        → our dark text
+     primary_color     → deep mountain green (buttons, highlights)
+     hide_gdpr_banner  → cleaner look inside the embed
+   ================================================================ */
+const CALENDLY_URL =
+  'https://calendly.com/razarashid1019' +
+  '?background_color=FAFAF7' +
+  '&text_color=1C2410' +
+  '&primary_color=1A4228' +
+  '&hide_gdpr_banner=1';
+
+const CALENDLY_CONFIGURED = true;
+
+/* ── What-to-expect steps shown on the left ── */
+const STEPS = [
+  {
+    num: '01',
+    title: 'Pick a time',
+    desc: 'Browse available slots and choose one that works for you. Consultations are 30 minutes.',
+  },
+  {
+    num: '02',
+    title: 'Share your travel vision',
+    desc: "Calendly will ask a few quick questions about your interests, travel dates, and group size.",
+  },
+  {
+    num: '03',
+    title: 'Receive your itinerary',
+    desc: 'Within 48 hours of your call, we\'ll send a custom travel proposal — no commitment needed.',
+  },
 ];
 
-const EMPTY_FORM = { name: '', email: '', phone: '', category: '', date: '', message: '' };
+/* ================================================================
+   CALENDLY WIDGET
+   Renders the real widget or a styled placeholder if not yet configured.
+   ================================================================ */
+function CalendlyWidget() {
+  const [loaded, setLoaded] = useState(false);
 
-function validate(fields) {
-  const errors = {};
-  if (!fields.name.trim() || fields.name.trim().length < 2)
-    errors.name = 'Please enter your full name (at least 2 characters).';
+  /* Listen for the Calendly iframe "profile page viewed" event,
+     which fires once the calendar grid finishes loading */
+  useCalendlyEventListener({
+    onProfilePageViewed: () => setLoaded(true),
+    onEventTypeViewed:   () => setLoaded(true),
+  });
 
-  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!fields.email.trim())
-    errors.email = 'Email address is required.';
-  else if (!emailRe.test(fields.email.trim()))
-    errors.email = 'Please enter a valid email address.';
-
-  if (!fields.phone.trim())
-    errors.phone = 'Phone number is required.';
-
-  if (!fields.category)
-    errors.category = 'Please select a preferred tour category.';
-
-  if (!fields.date) {
-    errors.date = 'Please select a preferred travel date.';
-  } else {
-    const chosen = new Date(fields.date);
-    const today  = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (chosen <= today) errors.date = 'Please choose a future travel date.';
-  }
-  return errors;
-}
-
-function tomorrowISO() {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().split('T')[0];
-}
-
-const TRUST_ITEMS = [
-  { icon: 'bi-clock',        text: 'We respond within 24 hours' },
-  { icon: 'bi-chat-dots',    text: 'Free, no-commitment consultation' },
-  { icon: 'bi-shield-check', text: 'Your details are never shared' },
-];
-
-function BookConsultation() {
-  const [fields,    setFields]    = useState(EMPTY_FORM);
-  const [errors,    setErrors]    = useState({});
-  const [touched,   setTouched]   = useState({});
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFields((prev) => ({ ...prev, [name]: value }));
-    if (touched[name]) {
-      const next = validate({ ...fields, [name]: value });
-      setErrors((prev) => ({ ...prev, [name]: next[name] }));
-    }
-  };
-
-  const handleBlur = (e) => {
-    const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    const next = validate(fields);
-    setErrors((prev) => ({ ...prev, [name]: next[name] }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const allTouched = Object.keys(EMPTY_FORM).reduce((a, k) => ({ ...a, [k]: true }), {});
-    setTouched(allTouched);
-    const next = validate(fields);
-    setErrors(next);
-    if (Object.keys(next).length === 0) setSubmitted(true);
-  };
-
-  const handleReset = () => {
-    setFields(EMPTY_FORM); setErrors({}); setTouched({}); setSubmitted(false);
-  };
-
-  const fieldState = (name) => {
-    if (!touched[name]) return {};
-    return errors[name] ? { isInvalid: true } : { isValid: true };
-  };
-
-  /* ── Success screen ──────────────────────────────────────────── */
-  if (submitted) {
+  if (!CALENDLY_CONFIGURED) {
     return (
-      <>
-        <PageBanner eyebrow="Request Received" title="Book a Consultation" />
-
-        <div className="booking-body">
-          <Container>
-            <Row className="justify-content-center">
-              <Col lg={7} md={9}>
-                <Card className="booking-card">
-                  <Card.Body>
-                    <div className="text-center py-3">
-                      <div className="success-ring" aria-hidden="true">
-                        <i className="bi bi-check-lg"></i>
-                      </div>
-                      <h2 className="section-heading mb-2" style={{ fontSize: '1.9rem' }}>
-                        You're on our radar, {fields.name.trim().split(' ')[0]}!
-                      </h2>
-                      <p className="section-body mx-auto mb-4" style={{ maxWidth: 420 }}>
-                        Thank you for reaching out. Our team will be in touch within{' '}
-                        <strong style={{ color: 'var(--text)' }}>24 hours</strong> at{' '}
-                        <strong style={{ color: 'var(--text)' }}>{fields.email}</strong>.
-                      </p>
-                      <Alert style={{
-                        background: 'rgba(45,106,79,0.08)', border: '1px solid rgba(45,106,79,0.18)',
-                        borderRadius: '8px', color: 'var(--green-deep)', fontSize: '0.88rem',
-                        maxWidth: 380, margin: '0 auto 2rem',
-                      }}>
-                        <i className="bi bi-info-circle me-2" aria-hidden="true"></i>
-                        Check your inbox for a confirmation copy.
-                      </Alert>
-                      <div className="d-flex gap-3 justify-content-center flex-wrap">
-                        <button className="btn-submit-form" onClick={handleReset}>
-                          Submit Another Request
-                        </button>
-                        <Link to="/" className="btn-outline-brand" style={{ display: 'inline-block' }}>
-                          Back to Home
-                        </Link>
-                      </div>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
-        </div>
-      </>
+      <div className="calendly-placeholder" role="status">
+        <i className="bi bi-calendar3" aria-hidden="true"></i>
+        <p>
+          <strong>Calendly widget will appear here.</strong>
+          <br />
+          Open <code>BookConsultation.js</code>, paste your Calendly
+          event URL into <code>CALENDLY_URL</code>, and set{' '}
+          <code>CALENDLY_CONFIGURED = true</code>.
+        </p>
+      </div>
     );
   }
 
-  /* ── Main form ───────────────────────────────────────────────── */
+  return (
+    <div className="calendly-shell">
+      {/* Spinner shown until Calendly fires its "viewed" event */}
+      {!loaded && (
+        <div className="calendly-loading" aria-live="polite">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading calendar…</span>
+          </Spinner>
+          <span>Loading availability…</span>
+        </div>
+      )}
+
+      {/*
+        InlineWidget renders an <iframe> from Calendly.
+        iframeTitle is required for screen-reader accessibility.
+        pageSettings lets us strip chrome that would look redundant
+        inside our own page layout.
+      */}
+      <InlineWidget
+        url={CALENDLY_URL}
+        iframeTitle="Book a Pakistan Tours consultation"
+        styles={{
+          /* Widget auto-resizes via postMessage; 680px is the minimum
+             before Calendly's own scrollbar kicks in */
+          minWidth: '100%',
+          height:   '680px',
+          display:  loaded ? 'block' : 'none',
+        }}
+        pageSettings={{
+          hideEventTypeDetails: false, // keep the event summary (name, duration)
+          hideLandingPageDetails: false,
+        }}
+      />
+    </div>
+  );
+}
+
+/* ================================================================
+   BOOKING PAGE
+   ================================================================ */
+function BookConsultation() {
   return (
     <>
       <PageBanner
-        eyebrow="Free & No Obligation"
+        eyebrow="Free · No Commitment"
         title="Book a Consultation"
-        subtitle="Tell us about your dream trip and we'll craft a personalised itinerary proposal — completely free, no commitment required."
+        subtitle="Choose a time that works for you. We'll talk through your dream Pakistan trip and follow up with a personalised proposal."
       />
 
-      <div className="booking-body">
+      <div className="booking-split-section">
         <Container>
-          <Row className="justify-content-center">
-            <Col lg={8} md={10}>
-              <Card className="booking-card">
-                <Card.Body>
-                  <Form onSubmit={handleSubmit} noValidate aria-label="Consultation booking form">
-                    <Row className="g-3 mb-3">
+          <Row className="align-items-start">
 
-                      {/* Full name */}
-                      <Col md={6}>
-                        <Form.Group controlId="field-name">
-                          <Form.Label>
-                            Full Name <span aria-hidden="true" style={{ color: 'var(--terracotta)' }}>*</span>
-                          </Form.Label>
-                          <Form.Control
-                            type="text" name="name" placeholder="e.g. Ahmed Malik"
-                            value={fields.name} onChange={handleChange} onBlur={handleBlur}
-                            autoComplete="name" aria-required="true"
-                            aria-describedby={errors.name ? 'name-error' : undefined}
-                            {...fieldState('name')}
-                          />
-                          {touched.name && errors.name && (
-                            <Form.Control.Feedback type="invalid" id="name-error" role="alert">
-                              {errors.name}
-                            </Form.Control.Feedback>
-                          )}
-                        </Form.Group>
-                      </Col>
+            {/* ── Left: steps + direct contact ───────────────── */}
+            <Col lg={4} md={12} className="booking-steps-col">
 
-                      {/* Email */}
-                      <Col md={6}>
-                        <Form.Group controlId="field-email">
-                          <Form.Label>
-                            Email Address <span aria-hidden="true" style={{ color: 'var(--terracotta)' }}>*</span>
-                          </Form.Label>
-                          <Form.Control
-                            type="email" name="email" placeholder="you@example.com"
-                            value={fields.email} onChange={handleChange} onBlur={handleBlur}
-                            autoComplete="email" aria-required="true"
-                            aria-describedby={errors.email ? 'email-error' : undefined}
-                            {...fieldState('email')}
-                          />
-                          {touched.email && errors.email && (
-                            <Form.Control.Feedback type="invalid" id="email-error" role="alert">
-                              {errors.email}
-                            </Form.Control.Feedback>
-                          )}
-                        </Form.Group>
-                      </Col>
+              <h2 className="booking-steps-heading">What to expect</h2>
+              <p className="booking-steps-sub">
+                A relaxed, 30-minute conversation — no sales pressure,
+                just genuine help planning your journey.
+              </p>
 
-                      {/* Phone */}
-                      <Col md={6}>
-                        <Form.Group controlId="field-phone">
-                          <Form.Label>
-                            Phone Number <span aria-hidden="true" style={{ color: 'var(--terracotta)' }}>*</span>
-                          </Form.Label>
-                          <Form.Control
-                            type="tel" name="phone" placeholder="+92 300 000 0000"
-                            value={fields.phone} onChange={handleChange} onBlur={handleBlur}
-                            autoComplete="tel" aria-required="true"
-                            aria-describedby={errors.phone ? 'phone-error' : undefined}
-                            {...fieldState('phone')}
-                          />
-                          {touched.phone && errors.phone && (
-                            <Form.Control.Feedback type="invalid" id="phone-error" role="alert">
-                              {errors.phone}
-                            </Form.Control.Feedback>
-                          )}
-                        </Form.Group>
-                      </Col>
+              {STEPS.map((step) => (
+                <div className="booking-step" key={step.num}>
+                  <div className="booking-step-num" aria-hidden="true">
+                    {step.num}
+                  </div>
+                  <div>
+                    <p className="booking-step-title">{step.title}</p>
+                    <p className="booking-step-desc">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
 
-                      {/* Travel date */}
-                      <Col md={6}>
-                        <Form.Group controlId="field-date">
-                          <Form.Label>
-                            Preferred Travel Date <span aria-hidden="true" style={{ color: 'var(--terracotta)' }}>*</span>
-                          </Form.Label>
-                          <Form.Control
-                            type="date" name="date" min={tomorrowISO()}
-                            value={fields.date} onChange={handleChange} onBlur={handleBlur}
-                            aria-required="true"
-                            aria-describedby={errors.date ? 'date-error' : undefined}
-                            {...fieldState('date')}
-                          />
-                          {touched.date && errors.date && (
-                            <Form.Control.Feedback type="invalid" id="date-error" role="alert">
-                              {errors.date}
-                            </Form.Control.Feedback>
-                          )}
-                        </Form.Group>
-                      </Col>
-
-                      {/* Category */}
-                      <Col md={12}>
-                        <Form.Group controlId="field-category">
-                          <Form.Label>
-                            Preferred Tour Category <span aria-hidden="true" style={{ color: 'var(--terracotta)' }}>*</span>
-                          </Form.Label>
-                          <Form.Select
-                            name="category" value={fields.category}
-                            onChange={handleChange} onBlur={handleBlur}
-                            aria-required="true"
-                            aria-describedby={errors.category ? 'category-error' : undefined}
-                            {...fieldState('category')}
-                          >
-                            {CATEGORIES.map((c) => (
-                              <option key={c.value} value={c.value} disabled={!c.value}>
-                                {c.label}
-                              </option>
-                            ))}
-                          </Form.Select>
-                          {touched.category && errors.category && (
-                            <Form.Control.Feedback type="invalid" id="category-error" role="alert">
-                              {errors.category}
-                            </Form.Control.Feedback>
-                          )}
-                        </Form.Group>
-                      </Col>
-
-                      {/* Message */}
-                      <Col md={12}>
-                        <Form.Group controlId="field-message">
-                          <Form.Label>
-                            Tell Us About Your Dream Trip{' '}
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>
-                              (optional)
-                            </span>
-                          </Form.Label>
-                          <Form.Control
-                            as="textarea" rows={4} name="message"
-                            placeholder="Preferences, special occasions, accessibility needs, destinations in mind…"
-                            value={fields.message} onChange={handleChange}
-                            style={{ resize: 'vertical' }}
-                          />
-                        </Form.Group>
-                      </Col>
-                    </Row>
-
-                    <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1.4rem' }}>
-                      <span style={{ color: 'var(--terracotta)' }}>*</span> Required fields
-                    </p>
-
-                    <div className="d-flex align-items-center gap-3 flex-wrap">
-                      <button type="submit" className="btn-submit-form">
-                        <i className="bi bi-send me-2" aria-hidden="true"></i>
-                        Send My Request
-                      </button>
-                      <span style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                        <i className="bi bi-lock me-1" aria-hidden="true"></i>
-                        Your information is kept private.
-                      </span>
-                    </div>
-                  </Form>
-                </Card.Body>
-              </Card>
-
-              {/* Trust badges */}
-              <Row className="g-3 mt-3">
-                {TRUST_ITEMS.map((item) => (
-                  <Col md={4} sm={12} key={item.text}>
-                    <div className="d-flex align-items-center gap-2"
-                      style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                      <i className={`bi ${item.icon}`}
-                        style={{ color: 'var(--gold)', fontSize: '1.1rem' }} aria-hidden="true" />
-                      {item.text}
-                    </div>
-                  </Col>
-                ))}
-              </Row>
+              {/* Direct contact fallback */}
+              <div className="booking-contact-block">
+                <span className="booking-contact-label">Prefer to reach us directly?</span>
+                <a
+                  href="https://wa.me/923001234567"
+                  className="booking-contact-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Chat on WhatsApp"
+                >
+                  <i className="bi bi-whatsapp" aria-hidden="true"></i>
+                  +92 300 123 4567 (WhatsApp)
+                </a>
+                <a
+                  href="mailto:hello@pakistantours.com"
+                  className="booking-contact-link"
+                  aria-label="Send us an email"
+                >
+                  <i className="bi bi-envelope" aria-hidden="true"></i>
+                  hello@pakistantours.com
+                </a>
+              </div>
             </Col>
+
+            {/* ── Right: Calendly widget ──────────────────────── */}
+            <Col lg={8} md={12} className="calendly-col">
+              <CalendlyWidget />
+            </Col>
+
           </Row>
         </Container>
       </div>

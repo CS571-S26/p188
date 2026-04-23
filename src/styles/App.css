@@ -1138,6 +1138,182 @@ a { color: inherit; }
   white-space: nowrap;
 }
 
+/* ── Booking — Calendly split layout ─────────────────────────── */
+.booking-split-section {
+  background: var(--cream);
+  padding: var(--section-py) 0;
+}
+
+/* Left column: numbered steps */
+.booking-steps-col {
+  padding-right: 2rem;
+}
+
+.booking-steps-heading {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.booking-steps-sub {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  line-height: 1.65;
+}
+
+.booking-step {
+  display: flex;
+  gap: 1.1rem;
+  margin-bottom: 1.6rem;
+  align-items: flex-start;
+}
+
+.booking-step-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.04em;
+}
+
+.booking-step-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.booking-step-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Divider + direct contact block */
+.booking-contact-block {
+  border-top: 1px solid var(--border);
+  padding-top: 1.6rem;
+  margin-top: 0.4rem;
+}
+
+.booking-contact-label {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.9rem;
+  display: block;
+}
+
+.booking-contact-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-muted) !important;
+  text-decoration: none !important;
+  margin-bottom: 0.55rem;
+  transition: color 0.2s;
+}
+.booking-contact-link:hover { color: var(--green-deep) !important; }
+.booking-contact-link i    { color: var(--gold); font-size: 1rem; }
+
+/* Right column: Calendly widget wrapper */
+.calendly-col {
+  /* nothing extra needed — widget fills the column */
+}
+
+/* The outer shell that wraps the Calendly iframe so it blends in */
+.calendly-shell {
+  background: #ffffff;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  /* Calendly's iframe sets its own height via postMessage;
+     we set a minimum so the shell doesn't collapse before it loads */
+  min-height: 680px;
+}
+
+/* Strip the default margin react-calendly adds */
+.calendly-shell .calendly-inline-widget {
+  min-width: 100% !important;
+}
+
+/* Loading skeleton shown while Calendly iframe loads */
+.calendly-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  min-height: 680px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.calendly-loading .spinner-border {
+  color: var(--green-mid);
+  width: 2rem;
+  height: 2rem;
+  border-width: 2px;
+}
+
+/* Placeholder card shown when no Calendly URL is set yet */
+.calendly-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 680px;
+  padding: 3rem;
+  text-align: center;
+  background: var(--cream);
+  border: 2px dashed var(--border);
+  border-radius: var(--r-lg);
+}
+
+.calendly-placeholder i {
+  font-size: 2.8rem;
+  color: var(--green-mid);
+  opacity: 0.4;
+}
+
+.calendly-placeholder p {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  max-width: 300px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.calendly-placeholder code {
+  font-size: 0.82rem;
+  background: var(--cream-dark);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  color: var(--green-deep);
+}
+
+@media (max-width: 991px) {
+  .booking-steps-col { padding-right: 0; margin-bottom: 2rem; }
+}
+
 /* ── 13. Responsive ───────────────────────────────────────────── */
 @media (max-width: 991px) {
   :root { --section-py: 5rem; }
