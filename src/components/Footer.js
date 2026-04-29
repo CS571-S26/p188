@@ -29,6 +29,14 @@ function Footer() {
                 <i className="bi bi-house" aria-hidden="true" />
                 Home
               </Link>
+              <Link to="/explore" className="footer-link">
+                <i className="bi bi-compass" aria-hidden="true" />
+                Explore Regions
+              </Link>
+              <Link to="/tour" className="footer-link">
+                <i className="bi bi-map" aria-hidden="true" />
+                Sample 4-Day Tour
+              </Link>
               <Link to="/book" className="footer-link">
                 <i className="bi bi-calendar-check" aria-hidden="true" />
                 Book a Consultation

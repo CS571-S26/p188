@@ -74,6 +74,15 @@ function AppNavbar() {
               Explore
             </Nav.Link>
 
+            <Nav.Link
+              as={NavLink}
+              to="/tour"
+              className="nav-link-custom"
+              onClick={() => setExpanded(false)}
+            >
+              Sample Tour
+            </Nav.Link>
+
             <div className="ms-lg-2">
               <Link
                 to="/book"
